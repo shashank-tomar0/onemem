@@ -146,6 +146,7 @@ graph TB
 ## User Flow
 
 ```mermaid
+%%{ init: { 'theme': 'dark', 'themeVariables': { 'actorBkg': '#7C3AED', 'actorTextColor': '#fff', 'actorBorder': '#9F67FF', 'signalColor': '#E2E8F0', 'signalTextColor': '#E2E8F0', 'noteBkgColor': '#1E293B', 'noteTextColor': '#E2E8F0', 'noteBorderColor': '#475569', 'rectBkgColor': '#0F172A', 'rectBorderColor': '#334155', 'rectTextColor': '#E2E8F0', 'sequenceNumberColor': '#fff' } }%%
 sequenceDiagram
     actor User
     participant CLI as CLI / MCP
@@ -153,7 +154,7 @@ sequenceDiagram
     participant LLM as LLM Provider
     participant DB as SQLite
 
-    rect rgb(232, 245, 233)
+    rect rgb(15, 23, 42)
         Note over User, DB: Write — ingest and distill
         User ->> CLI: onemem add "note"
         CLI ->> Core: ingest_event()
@@ -165,7 +166,7 @@ sequenceDiagram
         Core -->> CLI: event_ids
     end
 
-    rect rgb(227, 242, 253)
+    rect rgb(15, 23, 42)
         Note over User, DB: Read — retrieve and answer
         User ->> CLI: onemem ask "question?"
         CLI ->> LLM: extract search params
@@ -180,7 +181,7 @@ sequenceDiagram
         CLI -->> User: natural language answer
     end
 
-    rect rgb(243, 229, 245)
+    rect rgb(15, 23, 42)
         Note over User, DB: MCP — agent background write
         User ->> CLI: AI agent conversation
         CLI ->> Core: onemem_log(content)
