@@ -217,7 +217,7 @@ _LAUNCHD_RUNNING_MARKER = "state = running"
 _SYSTEMD_ACTIVE_STATE = "active"
 _CAPTURE_OUT_LOG = "capture.out.log"
 _CAPTURE_ERR_LOG = "capture.err.log"
-_NOT_INSTALLED_NOTICE = "  • Background capture is not installed — nothing to stop."
+_NOT_INSTALLED_NOTICE = "  ~ Background capture is not installed — nothing to stop."
 
 _SECONDS_PER_MINUTE = 60
 _SECONDS_PER_HOUR = 60 * _SECONDS_PER_MINUTE
@@ -284,7 +284,7 @@ def doctor() -> None:
     from onemem.exceptions import OneMemError, ModelUnavailableError
 
     def line(name: str, ok: bool | None, detail: str) -> None:
-        mark = "✓" if ok else ("•" if ok is None else "✗")
+        mark = "+" if ok else ("~" if ok is None else "!")
         click.echo(f"  {mark} {name:<14} {detail}")
 
     click.echo("oneMEM setup check\n")
@@ -375,7 +375,7 @@ def doctor() -> None:
             "provider issue above is fixed."
         )
     else:
-        click.echo("Fix the ✗ items above, then run `onemem doctor` again.")
+        click.echo("Fix the ! items above, then run `onemem doctor` again.")
 
 
 _PROVIDER_MENU = [
@@ -507,7 +507,7 @@ def _persist_api_key(api_key_env: str | None, key: str | None, env_path) -> None
     retained_lines.append(f"{api_key_env}={json.dumps(key)}")
     write_private_text(env_path, "\n".join(retained_lines) + "\n")
     os.environ[api_key_env] = key
-    click.echo(f"  ✓ {api_key_env} saved to {env_path}")
+    click.echo(f"  + {api_key_env} saved to {env_path}")
 
 
 def _prompt_model(provider: str) -> str:
@@ -554,9 +554,9 @@ def _configure_model_interactively() -> None:
     click.echo("  Checking API access and model availability…")
     ok, detail = _validate_provider_selection(provider, model, api_key, base_url)
     if not ok:
-        click.echo(f"  ✗ {detail}")
+        click.echo(f"  ! {detail}")
         raise click.ClickException("Provider setup failed. Nothing was saved.")
-    click.echo(f"  ✓ {detail}")
+    click.echo(f"  + {detail}")
 
     if should_persist_key:
         _persist_api_key(api_key_env, api_key, ONEMEM_HOME / ENV_FILENAME)
@@ -569,7 +569,7 @@ def _configure_model_interactively() -> None:
         api_key_env=api_key_env if provider == CUSTOM_PROVIDER else None,
     )
     importlib.reload(config)
-    click.echo(f"  ✓ Provider and model saved to {ONEMEM_HOME / CONFIG_FILENAME}")
+    click.echo(f"  + Provider and model saved to {ONEMEM_HOME / CONFIG_FILENAME}")
 
 
 @cli.group("config", invoke_without_command=True)
@@ -672,7 +672,7 @@ def init() -> None:
 
     men_mcp_path = shutil.which("onemem-mcp")
     if not men_mcp_path:
-        click.echo("  ✗ onemem-mcp not found on PATH — skipping.")
+        click.echo("  ! onemem-mcp not found on PATH — skipping.")
         click.echo("    Ensure oneMEM is installed and ~/.local/bin is on your PATH.")
     else:
         _wire_mcp_tools(men_mcp_path)
@@ -774,7 +774,7 @@ def _init_doctor() -> None:
     from onemem.exceptions import OneMemError, ModelUnavailableError
 
     def line(ok: bool | None, name: str, detail: str) -> None:
-        mark = "✓" if ok else ("•" if ok is None else "✗")
+        mark = "+" if ok else ("~" if ok is None else "!")
         click.echo(f"  {mark} {name:<14} {detail}")
 
     try:
@@ -858,7 +858,7 @@ def _install_background_service() -> None:
     elif system == _LINUX:
         installer = _install_systemd_unit
     else:
-        click.echo(f"  • No background service for {system}.")
+        click.echo(f"  ~ No background service for {system}.")
         click.echo("    Run `onemem watch --catch-up` manually to start capturing.")
         return
 
@@ -887,7 +887,7 @@ def _uninstall_background_service() -> None:
     elif system == _LINUX:
         _uninstall_systemd_unit()
     else:
-        click.echo(f"  • No background service is installed on {system}.")
+        click.echo(f"  ~ No background service is installed on {system}.")
 
 
 def _launchd_service() -> str:
@@ -981,10 +981,10 @@ def _still_running_after_grace(is_running) -> bool:
 
 def _report_stopped(still_running: bool, manual: str) -> None:
     if still_running:
-        click.echo("  ✗ Background capture is still running.")
+        click.echo("  ! Background capture is still running.")
         click.echo(f"    Stop it manually with: {manual}")
         return
-    click.echo("  ✓ Background capture stopped and removed")
+    click.echo("  + Background capture stopped and removed")
     click.echo("    Turn it back on with `onemem watch --start`.")
 
 
@@ -1020,7 +1020,7 @@ def _seed_capture(python_path: str) -> bool:
         text=True,
     )
     if seed.returncode != 0:
-        click.echo(f"  ✗ Could not initialize capture: {(seed.stderr or seed.stdout).strip()}")
+        click.echo(f"  ! Could not initialize capture: {(seed.stderr or seed.stdout).strip()}")
         return False
     return True
 
@@ -1029,10 +1029,10 @@ def _report_service(started: bool, detail: str, logs: str, manual: str) -> None:
     """Report what the supervisor actually did — never assume a clean exit means running."""
 
     if started:
-        click.echo("  ✓ Background service installed and started")
+        click.echo("  + Background service installed and started")
         click.echo(f"    Logs → {logs}")
     else:
-        click.echo(f"  ✗ Service did not stay running: {detail}")
+        click.echo(f"  ! Service did not stay running: {detail}")
         click.echo(f"    Logs → {logs}")
         click.echo(f"    Retry with: {manual}")
 
@@ -1125,7 +1125,7 @@ def _install_systemd_unit(python_path: str) -> None:
     journal = f"journalctl --user -u {unit_name}"
 
     if shutil.which(_SYSTEMCTL) is None:
-        click.echo("  • No systemd on this machine, so there is nothing to supervise the capture.")
+        click.echo("  ~ No systemd on this machine, so there is nothing to supervise the capture.")
         click.echo("    Run `onemem watch --catch-up` manually, or supervise it with your init system.")
         return
 
@@ -1234,13 +1234,13 @@ def _wire_mcp_tools(men_mcp_path: str) -> None:
                 text=True,
             )
             if result.returncode == 0:
-                click.echo(f"  ✓ Added to {tool_name} — restart it to activate")
+                click.echo(f"  + Added to {tool_name} — restart it to activate")
             else:
                 err = (result.stderr + result.stdout).strip().lower()
                 if "already" in err or "exists" in err:
-                    click.echo(f"  • Already wired into {tool_name}")
+                    click.echo(f"  ~ Already wired into {tool_name}")
                 else:
-                    click.echo(f"  ✗ Failed: {(result.stderr or result.stdout).strip()}")
+                    click.echo(f"  ! Failed: {(result.stderr or result.stdout).strip()}")
                     manual = " ".join(
                         [bin_name, "mcp", "add", *scope, "onemem", "--", men_mcp_path]
                     )
