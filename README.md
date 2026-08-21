@@ -115,7 +115,7 @@ Measured on a 100-instance stratified sample of [LongMemEval-S](https://arxiv.or
 ## Development
 
 ```console
-git clone https://github.com/YOUR_USERNAME/onemem.git
+git clone https://github.com/shashank-tomar0/onemem.git
 cd onemem
 uv sync --all-extras
 uv run pytest -q

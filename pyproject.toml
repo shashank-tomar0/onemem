@@ -56,9 +56,9 @@ onemem = "onemem.cli.main:cli"
 onemem-mcp = "onemem.mcp_server:mcp.run"
 
 [project.urls]
-Homepage = "https://github.com/YOUR_USERNAME/onemem"
-Repository = "https://github.com/YOUR_USERNAME/onemem"
-Issues = "https://github.com/YOUR_USERNAME/onemem/issues"
+Homepage = "https://github.com/shashank-tomar0/onemem"
+Repository = "https://github.com/shashank-tomar0/onemem"
+Issues = "https://github.com/shashank-tomar0/onemem/issues"
 
 [tool.hatch.build.targets.wheel]
 packages = ["onemem"]
