@@ -63,7 +63,134 @@ onemem ask "What storage did I choose, and why?"
 
 ---
 
-## 📐 How oneMEM Works
+## 📐 Architecture
+
+```mermaid
+graph TB
+    subgraph INPUTS ["Inputs"]
+        CLI["🖥️ CLI<br/>onemem &lt;command&gt;"]
+        MCP["🤖 MCP Server<br/>onemem-mcp"]
+        API["🌐 HTTP API<br/>FastAPI /events"]
+        WATCH["👁️ Watch<br/>Claude Code / Codex transcripts"]
+    end
+
+    subgraph WRITE ["✍️ Write Path"]
+        INTAKE["① ingest_event()<br/>chunk → dedup by content hash → store"]
+        EXTRACT["② extract_entities()<br/>LLM reads event → atomic facts + named entities"]
+        RECONCILE["③ reconcile + store<br/>normalize entities → link fact_entity_edges → store facts"]
+        EMBED_W["④ embed_facts()<br/>bge-base-en-v1.5 768-d local embedding"]
+    end
+
+    subgraph SQLITE ["📦 SQLite — ~/.onemem/onemem.db"]
+        EVENTS[("events<br/>raw content, append-only")]
+        EXTR[("extractions<br/>provenance ledger")]
+        FACTS[("facts<br/>atomic claims")]
+        ENTITIES[("entities<br/>canonical names")]
+        EDGES[("fact_entity_edges<br/>which entities each fact mentions")]
+        EMBED[("fact_embeddings<br/>sqlite-vec vec0, cosine")]
+        FTS[("facts_fts<br/>FTS5 keyword index")]
+    end
+
+    subgraph READ ["📖 Read Path"]
+        PARAMS["① LLM param extraction<br/>question → topic keywords + date range"]
+        RETRIEVE["② Deterministic Retrieval"]
+        VECTOR["Vector Door<br/>cosine similarity"]
+        KEYWORD["Keyword Door<br/>FTS5 BM25"]
+        ENTITY_D["Entity Door<br/>fact_entity_edges"]
+        FUSION["Fusion<br/>magnitude noisy-OR"]
+        CUT["③ Adaptive Cut<br/>score-curve ratio, bounded [10, limit]"]
+        COLLAPSE["Source Collapse<br/>if facts ≥ raw event tokens → return raw"]
+        SYNTH["④ LLM Synthesis<br/>(optional natural-language answer)"]
+    end
+
+    CLI --> INTAKE
+    MCP --> INTAKE
+    API --> INTAKE
+    WATCH --> INTAKE
+
+    INTAKE --> EVENTS
+    EVENTS --> EXTRACT
+    EXTRACT --> FACTS
+    EXTRACT --> ENTITIES
+    EXTRACT --> EXTR
+    RECONCILE --> EDGES
+    EMBED_W --> EMBED
+    FACTS --> FTS
+
+    CLI --> PARAMS
+    MCP --> PARAMS
+
+    PARAMS --> RETRIEVE
+    RETRIEVE --> VECTOR
+    RETRIEVE --> KEYWORD
+    RETRIEVE --> ENTITY_D
+    VECTOR --> FUSION
+    KEYWORD --> FUSION
+    ENTITY_D --> FUSION
+    FUSION --> CUT
+    CUT --> COLLAPSE
+    COLLAPSE --> SYNTH
+
+    EMBED --> VECTOR
+    FTS --> KEYWORD
+    EDGES --> ENTITY_D
+```
+
+**Key design principles:**
+- **Append-only** — raw events are never overwritten; facts are only ever added
+- **Deterministic retrieval** — no LLM in the read path; same query always returns the same result
+- **Small models at the edges** — LLM only at write time (distill) and optionally at read time (synthesize)
+
+---
+
+## 🔄 User Flow
+
+```mermaid
+flowchart LR
+    START(["🧠 User has a thought"])
+
+    subgraph WRITE ["✍️ Write"]
+        direction TB
+        ADD["onemem add<br/>'note'"]
+        IMPORT["onemem import<br/>./docs/"]
+        WATCH2["onemem watch<br/>(background capture)"]
+        MCP_LOG["onemem_log<br/>(invisible agent write)"]
+    end
+
+    subgraph PROCESS ["⚙️ Process"]
+        direction TB
+        LLM_EXTRACT["LLM distills<br/>facts + entities"]
+        RECON["Entity reconciliation<br/>normalize + deduplicate"]
+        LOCAL_EMBED["Local embedding<br/>bge-base 768-d"]
+    end
+
+    subgraph STORE ["📦 Store"]
+        SQLITE[("SQLite<br/>events → facts<br/>→ embeddings<br/>→ FTS5 index")]
+    end
+
+    subgraph READ ["📖 Read"]
+        direction TB
+        ASK["onemem ask<br/>'question'"]
+        MCP_RECALL["onemem_recall<br/>(AI agent call)"]
+        SQL["onemem sql<br/>'SELECT...'"]
+        LIST["onemem list events"]
+    end
+
+    START --> WRITE
+    WRITE --> PROCESS
+    PROCESS --> STORE
+    STORE --> READ
+    READ --> ANSWER(["✨ User gets answer"])
+
+    style WRITE fill:#dcfce7,stroke:#16a34a,color:#15803d
+    style PROCESS fill:#fef9c3,stroke:#ca8a04,color:#a16207
+    style STORE fill:#e0e7ff,stroke:#4f46e5,color:#4338ca
+    style READ fill:#dbeafe,stroke:#2563eb,color:#1d4ed8
+```
+
+---
+
+## ⚡ All Commands — Visual Reference
 
 <div align="center">
 
@@ -71,53 +198,28 @@ onemem ask "What storage did I choose, and why?"
 
 </div>
 
-oneMEM receives unstructured text (chat turns, notes, imported files), distills it
-into **atomic facts**, stores everything **append-only** in one SQLite file, and
-makes it retrievable through a **deterministic hybrid search** — no LLM in the
-read path. Any MCP-capable agent reads and writes the same memory.
-
-### Write Path
-
-| Step | What happens |
-|:----:|---|
-| **① Ingest** | Content is chunked, deduplicated by content hash, and stored as raw events |
-| **② Extract** | An LLM reads each event and produces atomic facts + named entities |
-| **③ Reconcile** | Entities are normalized, deduplicated, and linked to facts via edges |
-| **④ Embed** | Each fact is embedded locally with `bge-base-en-v1.5` (768-d vectors) |
-| **⑤ Store** | Facts, embeddings, and FTS5 indexes are written to SQLite |
-
-### Read Path (Deterministic — No LLM)
-
-| Step | What happens |
-|:----:|---|
-| **Query** | User question or agent request |
-| **Three doors** | Vector (cosine similarity) + Keyword (FTS5 BM25) + Entity (fact edges) |
-| **Fusion** | `fused = 1 − (1−v)(1−f)(1−e)` — magnitude noisy-OR |
-| **Adaptive cut** | Keep facts scoring ≥ 50% of the top score, bounded to `[10, limit]` |
-| **Source collapse** | If facts cost ≥ raw event tokens, return the raw event instead |
-
 ---
 
 ## 📋 Commands
 
 | Command | Purpose | Path |
 |---|---|---|
-| `onemem init` | Interactive setup wizard | — |
+| `onemem init` | Interactive setup wizard (provider, key, model, capture, MCP) | — |
 | `onemem add "text"` | Store a note directly | ✍️ write |
-| `onemem ask "question"` | Retrieve + synthesize an answer | 📖 read |
-| `onemem import <path>` | Bulk-import `.txt` / `.md` files | ✍️ write |
-| `onemem process` | Process pending events | ✍️ write |
-| `onemem watch` | Capture Claude Code / Codex sessions | ✍️ write |
+| `onemem ask "question"` | Retrieve matching facts + optional LLM synthesis | 📖 read |
+| `onemem import <path>` | Bulk-import `.txt` / `.md` files (parallel batch) | ✍️ write |
+| `onemem process` | Process all pending events (extract facts) | ✍️ write |
+| `onemem watch` | Capture Claude Code / Codex sessions in real-time | ✍️ write |
 | `onemem watch --start` | Start background capture service | ✍️ write |
 | `onemem watch --stop` | Stop background capture service | ✍️ write |
-| `onemem status` | Event / fact / entity counts | 📖 read |
-| `onemem doctor` | Health check (DB, sqlite-vec, LLM) | 📖 read |
+| `onemem status` | Event / fact / entity counts + staleness detection | 📖 read |
+| `onemem doctor` | Health check (DB, sqlite-vec, LLM, write path) | 📖 read |
 | `onemem list events` | Browse events (`--since`, `--until`, `--source`) | 📖 read |
 | `onemem show event N` | Full event detail + extraction provenance | 📖 read |
-| `onemem sql "SELECT..."` | Read-only SQL query | 📖 read |
-| `onemem tables` | List DB tables with row counts | 📖 read |
-| `onemem config set` | Change provider, API key, model | ⚙️ config |
-| `onemem config show` | Show active config safely | 📖 read |
+| `onemem sql "SELECT..."` | Read-only SQL query against the memory | 📖 read |
+| `onemem tables` | List all DB tables with row counts | 📖 read |
+| `onemem config set` | Interactively change provider, API key, model | ⚙️ config |
+| `onemem config show` | Show active config safely (never exposes full key) | 📖 read |
 
 ---
 
@@ -223,6 +325,9 @@ onemem/
 ├── cli/                  # Click CLI (init, add, ask, watch, ...)
 ├── api/                  # FastAPI HTTP API
 ├── providers/            # LLM + embedding implementations
+│   ├── openai_compat.py      # OpenAI-compatible endpoints
+│   ├── anthropic.py          # Anthropic native API
+│   └── local_embedding.py    # bge-base-en-v1.5
 ├── mcp_server.py         # MCP server (onemem_recall + onemem_log)
 ├── fact_retrieval.py     # Deterministic hybrid search
 ├── pipeline.py           # Ingest + process orchestration
