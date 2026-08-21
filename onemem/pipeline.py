@@ -205,7 +205,7 @@ def ingest_and_process(
 
     Intake (Stage 1) always commits, so the event is durable even when no model
     is available. If the model is None or becomes unavailable mid-run, the
-    created events stay ``pending`` for a later ``men process``; this function
+        created events stay ``pending`` for a later ``onemem process``; this function
     never raises ModelUnavailableError to the caller.
     """
 
@@ -283,7 +283,7 @@ def _process_events_batch(
     on_progress: "Callable[[int, int], None] | None" = None,
     allow_large_run: bool = False,
 ) -> list[int]:
-    """Parallel batch engine shared by `men import` and `men process`."""
+    """Parallel batch engine shared by `onemem import` and `onemem process`."""
 
     from onemem import config
     from onemem.spend_gate import enforce_spend_ceiling
@@ -315,7 +315,7 @@ def _process_events_batch(
         if not extractions:
             logger.warning(
                 "Import halted: model unavailable for a whole window; "
-                "remaining events stay pending (resume with `men process`)."
+                "remaining events stay pending (resume with `onemem process`)."
             )
             break
 

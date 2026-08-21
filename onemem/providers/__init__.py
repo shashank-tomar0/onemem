@@ -81,7 +81,7 @@ def get_model(provider_name: str | None = None, model: str | None = None) -> Mod
     """Instantiate an LLM provider: resolve base_url + key from the preset/custom config.
 
     Reads `config.*` at call time (not import time) so a config.toml rewritten
-    mid-process (e.g. by `men init`) takes effect immediately.
+    mid-process (e.g. by `onemem init`) takes effect immediately.
 
     `model` is an optional per-call override; ordinary commands use the single
     model selected by the user during setup.
@@ -90,13 +90,13 @@ def get_model(provider_name: str | None = None, model: str | None = None) -> Mod
     name = provider_name or config.DEFAULT_MODEL_PROVIDER
     if not name:
         raise ModelUnavailableError(
-            "No LLM provider configured. Run `men init` to set one up."
+            "No LLM provider configured. Run `onemem init` to set one up."
         )
 
     resolved_model = model or config.MODEL
     if not resolved_model:
         raise ModelUnavailableError(
-            "No model configured. Run `men config set` (or `men init`) to choose one."
+            "No model configured. Run `onemem config set` (or `onemem init`) to choose one."
         )
 
     if name == config.CUSTOM_PROVIDER:
