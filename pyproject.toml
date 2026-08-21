@@ -1,0 +1,67 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "onemem"
+version = "0.1.0"
+description = "One memory. Every AI. You own it. — Local structured memory for AI agents"
+readme = "README.md"
+authors = [{ name = "oneMEM" }]
+license = "MIT"
+requires-python = ">=3.11"
+keywords = ["memory", "ai-agents", "llm", "mcp", "retrieval", "sqlite", "long-term-memory"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+dependencies = [
+    "click>=8.0",
+    "pydantic>=2.0",
+    "python-dotenv>=1.0",
+    "requests>=2.0",
+]
+
+[project.optional-dependencies]
+local-embedding = [
+    "sentence-transformers>=2.0",
+]
+api = [
+    "fastapi>=0.100",
+    "uvicorn>=0.20",
+]
+vec = [
+    "sqlite-vec>=0.1",
+]
+mcp = [
+    "mcp[cli]>=1.27,<2",
+]
+all = [
+    "onemem[local-embedding,api,vec,mcp]",
+]
+dev = [
+    "pytest>=7.0",
+    "pytest-cov>=4.0",
+]
+
+[project.scripts]
+onemem = "onemem.cli.main:cli"
+onemem-mcp = "onemem.mcp_server:mcp.run"
+
+[project.urls]
+Homepage = "https://github.com/YOUR_USERNAME/onemem"
+Repository = "https://github.com/YOUR_USERNAME/onemem"
+Issues = "https://github.com/YOUR_USERNAME/onemem/issues"
+
+[tool.hatch.build.targets.wheel]
+packages = ["onemem"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

@@ -1,0 +1,9 @@
+{
+  "name": "onemem",
+  "displayName": "oneMEM Memory",
+  "version": "0.1.0",
+  "description": "One memory. Every AI. You own it. — Local, inspectable, append-only memory: distilled facts from what you record, retrieved deterministically. Adds onemem_recall (read) and onemem_log (write).",
+  "author": {"name": "oneMEM"},
+  "keywords": ["memory", "mcp", "local-first", "recall", "ai-agents"],
+  "mcpServers": "./.mcp.json"
+}

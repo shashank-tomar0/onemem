@@ -1,0 +1,27 @@
+.env
+
+# python
+__pycache__/
+*.pyc
+.venv/
+venv/
+.onemem-dev/
+.pytest_cache/
+*.egg-info/
+.DS_Store
+
+.mcp.json
+
+# benchmark data & frozen memories (large; regenerable via bench/)
+bench/data/
+bench/out/
+bench/memories*/
+bench/*.log
+
+demo/
+
+notes/
+
+# build artifacts
+/dist/
+/build/
