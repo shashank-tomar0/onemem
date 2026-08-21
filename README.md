@@ -98,9 +98,9 @@ graph TB
         KEYWORD["Keyword Door<br/>FTS5 BM25"]
         ENTITY_D["Entity Door<br/>fact_entity_edges"]
         FUSION["Fusion<br/>magnitude noisy-OR"]
-        CUT["③ Adaptive Cut<br/>score-curve ratio, bounded [10, limit]"]
+        CUT["③ Adaptive Cut<br/>score-curve ratio, bounded 10 to limit"]
         COLLAPSE["Source Collapse<br/>if facts ≥ raw event tokens → return raw"]
-        SYNTH["④ LLM Synthesis<br/>(optional natural-language answer)"]
+        SYNTH["④ LLM Synthesis<br/>optional natural-language answer"]
     end
 
     CLI --> INTAKE
@@ -146,46 +146,41 @@ graph TB
 ## 🔄 User Flow
 
 ```mermaid
-flowchart LR
-    START(["🧠 User has a thought"])
+sequenceDiagram
+    participant User
+    participant CLI as CLI / MCP
+    participant Core as oneMEM Core
+    participant LLM as LLM Provider
+    participant DB as SQLite
 
-    subgraph WRITE ["✍️ Write"]
-        direction TB
-        ADD["onemem add<br/>'note'"]
-        IMPORT["onemem import<br/>./docs/"]
-        WATCH2["onemem watch<br/>(background capture)"]
-        MCP_LOG["onemem_log<br/>(invisible agent write)"]
-    end
+    Note over User,DB: ✍️ Write — ingest and distill
+    User->>CLI: onemem add "note"
+    CLI->>Core: ingest_event()
+    Core->>DB: store raw event
+    Core->>LLM: extract facts + entities
+    LLM-->>Core: ExtractionResult
+    Core->>DB: store facts, entities, edges
+    Core->>DB: embed facts (768-d local)
+    Core-->>CLI: event_ids
 
-    subgraph PROCESS ["⚙️ Process"]
-        direction TB
-        LLM_EXTRACT["LLM distills<br/>facts + entities"]
-        RECON["Entity reconciliation<br/>normalize + deduplicate"]
-        LOCAL_EMBED["Local embedding<br/>bge-base 768-d"]
-    end
+    Note over User,DB: 📖 Read — retrieve and answer
+    User->>CLI: onemem ask "question?"
+    CLI->>LLM: extract search params
+    LLM-->>CLI: {text, start, end}
+    CLI->>Core: retrieve(text, start, end)
+    Core->>DB: vector + keyword + entity search
+    DB-->>Core: matched facts
+    Core->>Core: fusion → adaptive cut
+    Core-->>CLI: facts with scores
+    CLI->>LLM: synthesize answer from facts
+    LLM-->>CLI: AskAnswer
+    CLI-->>User: natural language answer
 
-    subgraph STORE ["📦 Store"]
-        SQLITE[("SQLite<br/>events → facts<br/>→ embeddings<br/>→ FTS5 index")]
-    end
-
-    subgraph READ ["📖 Read"]
-        direction TB
-        ASK["onemem ask<br/>'question'"]
-        MCP_RECALL["onemem_recall<br/>(AI agent call)"]
-        SQL["onemem sql<br/>'SELECT...'"]
-        LIST["onemem list events"]
-    end
-
-    START --> WRITE
-    WRITE --> PROCESS
-    PROCESS --> STORE
-    STORE --> READ
-    READ --> ANSWER(["✨ User gets answer"])
-
-    style WRITE fill:#dcfce7,stroke:#16a34a,color:#15803d
-    style PROCESS fill:#fef9c3,stroke:#ca8a04,color:#a16207
-    style STORE fill:#e0e7ff,stroke:#4f46e5,color:#4338ca
-    style READ fill:#dbeafe,stroke:#2563eb,color:#1d4ed8
+    Note over User,DB: 🔌 MCP — agent background write
+    User->>CLI: AI agent conversation
+    CLI->>Core: onemem_log(content)
+    Core->>DB: store raw event
+    Note right of Core: background processor<br/>extracts facts later
 ```
 
 ---
