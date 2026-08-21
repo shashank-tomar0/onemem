@@ -32,20 +32,20 @@ Local tools ─┘
 
 ---
 
-## ✨ Why oneMEM?
+## Why oneMEM?
 
 | | |
 |---|---|
-| 🔒 **Local & private** | One SQLite file. No server, no cloud, no account. Back it up by copying a file. |
-| 🧠 **Deterministic retrieval** | No LLM in the read path. Same query → same result, always. Inspectable with SQL. |
-| 🔗 **Append-only** | Events are never overwritten. Facts are only ever added. Corrections = new events. |
-| 🤖 **MCP-native** | Two tools (`onemem_recall` + `onemem_log`) — works with Claude Code, Codex, Cursor, Windsurf. |
-| 🌐 **BYOLLM** | OpenRouter, OpenAI, Anthropic, Gemini, Groq, xAI, Hugging Face, Ollama, or any OpenAI-compatible endpoint. |
-| ⚡ **Local embeddings** | `bge-base-en-v1.5` (768-d) runs locally. No embedding API, no extra key, no latency. |
+| **Local & private** | One SQLite file. No server, no cloud, no account. Back it up by copying a file. |
+| **Deterministic retrieval** | No LLM in the read path. Same query returns the same result, always. Inspectable with SQL. |
+| **Append-only** | Events are never overwritten. Facts are only ever added. Corrections are new events. |
+| **MCP-native** | Two tools (`onemem_recall` + `onemem_log`) — works with Claude Code, Codex, Cursor, Windsurf. |
+| **BYOLLM** | OpenRouter, OpenAI, Anthropic, Gemini, Groq, xAI, Hugging Face, Ollama, or any OpenAI-compatible endpoint. |
+| **Local embeddings** | `bge-base-en-v1.5` (768-d) runs locally. No embedding API, no extra key, no latency. |
 
 ---
 
-## 🚀 Quick Start
+## Quick Start
 
 Requires **Python 3.11+** and an API key for any LLM provider. Embeddings run locally.
 
@@ -63,25 +63,25 @@ onemem ask "What storage did I choose, and why?"
 
 ---
 
-## 📐 Architecture
+## Architecture
 
 ```mermaid
 graph TB
     subgraph INPUTS ["Inputs"]
-        CLI["🖥️ CLI<br/>onemem &lt;command&gt;"]
-        MCP["🤖 MCP Server<br/>onemem-mcp"]
-        API["🌐 HTTP API<br/>FastAPI /events"]
-        WATCH["👁️ Watch<br/>Claude Code / Codex transcripts"]
+        CLI["CLI<br/>onemem &lt;command&gt;"]
+        MCP["MCP Server<br/>onemem-mcp"]
+        API["HTTP API<br/>FastAPI /events"]
+        WATCH["Watch<br/>Claude Code / Codex transcripts"]
     end
 
-    subgraph WRITE ["✍️ Write Path"]
-        INTAKE["① ingest_event()<br/>chunk → dedup by content hash → store"]
-        EXTRACT["② extract_entities()<br/>LLM reads event → atomic facts + named entities"]
-        RECONCILE["③ reconcile + store<br/>normalize entities → link fact_entity_edges → store facts"]
-        EMBED_W["④ embed_facts()<br/>bge-base-en-v1.5 768-d local embedding"]
+    subgraph WRITE ["Write Path"]
+        INTAKE["1. ingest_event()<br/>chunk - dedup by content hash - store"]
+        EXTRACT["2. extract_entities()<br/>LLM reads event - atomic facts + named entities"]
+        RECONCILE["3. reconcile + store<br/>normalize entities - link fact_entity_edges - store facts"]
+        EMBED_W["4. embed_facts()<br/>bge-base-en-v1.5 768-d local embedding"]
     end
 
-    subgraph SQLITE ["📦 SQLite — ~/.onemem/onemem.db"]
+    subgraph SQLITE ["SQLite - ~/.onemem/onemem.db"]
         EVENTS[("events<br/>raw content, append-only")]
         EXTR[("extractions<br/>provenance ledger")]
         FACTS[("facts<br/>atomic claims")]
@@ -91,16 +91,16 @@ graph TB
         FTS[("facts_fts<br/>FTS5 keyword index")]
     end
 
-    subgraph READ ["📖 Read Path"]
-        PARAMS["① LLM param extraction<br/>question → topic keywords + date range"]
-        RETRIEVE["② Deterministic Retrieval"]
+    subgraph READ ["Read Path"]
+        PARAMS["1. LLM param extraction<br/>question - topic keywords + date range"]
+        RETRIEVE["2. Deterministic Retrieval"]
         VECTOR["Vector Door<br/>cosine similarity"]
         KEYWORD["Keyword Door<br/>FTS5 BM25"]
         ENTITY_D["Entity Door<br/>fact_entity_edges"]
         FUSION["Fusion<br/>magnitude noisy-OR"]
-        CUT["③ Adaptive Cut<br/>score-curve ratio, bounded 10 to limit"]
-        COLLAPSE["Source Collapse<br/>if facts ≥ raw event tokens → return raw"]
-        SYNTH["④ LLM Synthesis<br/>optional natural-language answer"]
+        CUT["3. Adaptive Cut<br/>score-curve ratio, bounded 10 to limit"]
+        COLLAPSE["Source Collapse<br/>if facts - raw event tokens - return raw"]
+        SYNTH["4. LLM Synthesis<br/>optional natural-language answer"]
     end
 
     CLI --> INTAKE
@@ -143,49 +143,55 @@ graph TB
 
 ---
 
-## 🔄 User Flow
+## User Flow
 
 ```mermaid
 sequenceDiagram
-    participant User
+    actor User
     participant CLI as CLI / MCP
     participant Core as oneMEM Core
     participant LLM as LLM Provider
     participant DB as SQLite
 
-    Note over User,DB: ✍️ Write — ingest and distill
-    User->>CLI: onemem add "note"
-    CLI->>Core: ingest_event()
-    Core->>DB: store raw event
-    Core->>LLM: extract facts + entities
-    LLM-->>Core: ExtractionResult
-    Core->>DB: store facts, entities, edges
-    Core->>DB: embed facts (768-d local)
-    Core-->>CLI: event_ids
+    rect rgb(232, 245, 233)
+        Note over User, DB: Write — ingest and distill
+        User ->> CLI: onemem add "note"
+        CLI ->> Core: ingest_event()
+        Core ->> DB: store raw event
+        Core ->> LLM: extract facts + entities
+        LLM -->> Core: ExtractionResult
+        Core ->> DB: store facts, entities, edges
+        Core ->> Core: embed facts (768-d, local)
+        Core -->> CLI: event_ids
+    end
 
-    Note over User,DB: 📖 Read — retrieve and answer
-    User->>CLI: onemem ask "question?"
-    CLI->>LLM: extract search params
-    LLM-->>CLI: {text, start, end}
-    CLI->>Core: retrieve(text, start, end)
-    Core->>DB: vector + keyword + entity search
-    DB-->>Core: matched facts
-    Core->>Core: fusion → adaptive cut
-    Core-->>CLI: facts with scores
-    CLI->>LLM: synthesize answer from facts
-    LLM-->>CLI: AskAnswer
-    CLI-->>User: natural language answer
+    rect rgb(227, 242, 253)
+        Note over User, DB: Read — retrieve and answer
+        User ->> CLI: onemem ask "question?"
+        CLI ->> LLM: extract search params
+        LLM -->> CLI: {text, start, end}
+        CLI ->> Core: retrieve(text, start, end)
+        Core ->> DB: vector + keyword + entity search
+        DB -->> Core: matched facts
+        Core ->> Core: fusion then adaptive cut
+        Core -->> CLI: facts with scores
+        CLI ->> LLM: synthesize answer from facts
+        LLM -->> CLI: AskAnswer
+        CLI -->> User: natural language answer
+    end
 
-    Note over User,DB: 🔌 MCP — agent background write
-    User->>CLI: AI agent conversation
-    CLI->>Core: onemem_log(content)
-    Core->>DB: store raw event
-    Note right of Core: background processor<br/>extracts facts later
+    rect rgb(243, 229, 245)
+        Note over User, DB: MCP — agent background write
+        User ->> CLI: AI agent conversation
+        CLI ->> Core: onemem_log(content)
+        Core ->> DB: store raw event
+        Note right of Core: background processor<br/>extracts facts later
+    end
 ```
 
 ---
 
-## ⚡ All Commands — Visual Reference
+## Command Flow
 
 <div align="center">
 
@@ -195,30 +201,30 @@ sequenceDiagram
 
 ---
 
-## 📋 Commands
+## Commands
 
 | Command | Purpose | Path |
 |---|---|---|
-| `onemem init` | Interactive setup wizard (provider, key, model, capture, MCP) | — |
-| `onemem add "text"` | Store a note directly | ✍️ write |
-| `onemem ask "question"` | Retrieve matching facts + optional LLM synthesis | 📖 read |
-| `onemem import <path>` | Bulk-import `.txt` / `.md` files (parallel batch) | ✍️ write |
-| `onemem process` | Process all pending events (extract facts) | ✍️ write |
-| `onemem watch` | Capture Claude Code / Codex sessions in real-time | ✍️ write |
-| `onemem watch --start` | Start background capture service | ✍️ write |
-| `onemem watch --stop` | Stop background capture service | ✍️ write |
-| `onemem status` | Event / fact / entity counts + staleness detection | 📖 read |
-| `onemem doctor` | Health check (DB, sqlite-vec, LLM, write path) | 📖 read |
-| `onemem list events` | Browse events (`--since`, `--until`, `--source`) | 📖 read |
-| `onemem show event N` | Full event detail + extraction provenance | 📖 read |
-| `onemem sql "SELECT..."` | Read-only SQL query against the memory | 📖 read |
-| `onemem tables` | List all DB tables with row counts | 📖 read |
-| `onemem config set` | Interactively change provider, API key, model | ⚙️ config |
-| `onemem config show` | Show active config safely (never exposes full key) | 📖 read |
+| `onemem init` | Interactive setup wizard (provider, key, model, capture, MCP) | -- |
+| `onemem add "text"` | Store a note directly | write |
+| `onemem ask "question"` | Retrieve matching facts + optional LLM synthesis | read |
+| `onemem import <path>` | Bulk-import `.txt` / `.md` files (parallel batch) | write |
+| `onemem process` | Process all pending events (extract facts) | write |
+| `onemem watch` | Capture Claude Code / Codex sessions in real-time | write |
+| `onemem watch --start` | Start background capture service | write |
+| `onemem watch --stop` | Stop background capture service | write |
+| `onemem status` | Event / fact / entity counts + staleness detection | read |
+| `onemem doctor` | Health check (DB, sqlite-vec, LLM, write path) | read |
+| `onemem list events` | Browse events (`--since`, `--until`, `--source`) | read |
+| `onemem show event N` | Full event detail + extraction provenance | read |
+| `onemem sql "SELECT..."` | Read-only SQL query against the memory | read |
+| `onemem tables` | List all DB tables with row counts | read |
+| `onemem config set` | Interactively change provider, API key, model | config |
+| `onemem config show` | Show active config safely (never exposes full key) | read |
 
 ---
 
-## 🔌 MCP Setup
+## MCP Setup
 
 oneMEM works with **any MCP client** that supports local `stdio` servers.
 
@@ -241,7 +247,7 @@ codex mcp add onemem -- "$(command -v onemem-mcp)"
 
 ---
 
-## 🏗️ Supported Providers
+## Supported Providers
 
 | Provider | Key Env Var | Notes |
 |---|---|---|
@@ -259,7 +265,7 @@ Embeddings always use **`bge-base-en-v1.5`** (768-d) running locally — no API 
 
 ---
 
-## 📊 Benchmarks
+## Benchmarks
 
 Measured on a 100-instance stratified sample of [LongMemEval-S](https://arxiv.org/abs/2410.10813):
 
@@ -271,7 +277,7 @@ Measured on a 100-instance stratified sample of [LongMemEval-S](https://arxiv.or
 
 ---
 
-## ⚙️ Configuration
+## Configuration
 
 Edit `~/.onemem/config.toml` (or use `onemem config set`):
 
@@ -301,7 +307,7 @@ concurrency = 20           # parallel LLM workers during bulk import
 
 ---
 
-## 🛠️ Development
+## Development
 
 ```bash
 git clone https://github.com/shashank-tomar0/onemem.git
@@ -313,7 +319,7 @@ uv run pytest -q                    # 144 passing
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 onemem/
@@ -333,7 +339,7 @@ onemem/
 
 ---
 
-## 📜 License
+## License
 
 MIT — Based on [Meniscus](https://github.com/magic-bubblez/meniscus) by magic_bubblez.
 
@@ -343,6 +349,6 @@ MIT — Based on [Meniscus](https://github.com/magic-bubblez/meniscus) by magic_
 
 **oneMEM** — Your memory, your machine, your AI.
 
-[Get Started →](#-quick-start) · [Report Bug](https://github.com/shashank-tomar0/onemem/issues) · [View Design](DESIGN.md) · [PyPI](https://pypi.org/project/onemem/)
+[Get Started](#quick-start) · [Report Bug](https://github.com/shashank-tomar0/onemem/issues) · [View Design](DESIGN.md) · [PyPI](https://pypi.org/project/onemem/)
 
 </div>

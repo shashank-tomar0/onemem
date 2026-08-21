@@ -3,124 +3,150 @@
 <head>
 <meta charset="UTF-8">
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Virgil:wght@400&display=swap');
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
-    background: #191919;
+    background: #F8F9FA;
     width: 1200px;
-    font-family: 'Caveat', cursive;
-    color: #fff;
-    padding: 40px 50px 50px;
+    font-family: 'Virgil', 'Segoe Print', cursive;
+    color: #1e1e1e;
+    padding: 48px 56px 56px;
   }
+
+  /* Title */
   h1 {
-    font-size: 52px;
-    color: #a64dff;
+    font-size: 42px;
     text-align: center;
-    margin-bottom: 4px;
-    font-weight: 700;
+    margin-bottom: 6px;
+    letter-spacing: 0.5px;
   }
   .subtitle {
     text-align: center;
-    color: #868e96;
-    font-size: 22px;
-    margin-bottom: 40px;
+    color: #666;
+    font-size: 20px;
+    margin-bottom: 44px;
   }
-  .section-title {
-    font-size: 30px;
-    margin: 36px 0 8px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-  .section-line {
-    border: none;
-    border-top: 2px dashed #333;
-    margin-bottom: 20px;
+
+  /* Section headers */
+  .section-label {
+    font-size: 24px;
+    margin: 32px 0 14px;
+    padding-bottom: 6px;
+    border-bottom: 2px dashed #ccc;
+    color: #444;
   }
 
   /* Entry points row */
   .entries {
     display: flex;
-    gap: 20px;
+    gap: 24px;
     justify-content: center;
-    margin: 30px 0 10px;
+    margin: 0 0 12px;
   }
   .entry-card {
     border-radius: 12px;
-    padding: 16px 28px;
+    padding: 18px 32px;
     text-align: center;
-    min-width: 220px;
+    min-width: 240px;
     border: 2px solid;
+    background: #fff;
+    box-shadow: 2px 2px 0 rgba(0,0,0,0.06);
   }
-  .entry-card .icon { font-size: 28px; }
-  .entry-card .name { font-size: 24px; font-weight: 600; margin: 4px 0; }
-  .entry-card .sub { font-size: 15px; opacity: 0.6; }
+  .entry-card .name {
+    font-size: 26px;
+    font-weight: 400;
+  }
+  .entry-card .sub {
+    font-size: 17px;
+    color: #888;
+    margin-top: 4px;
+  }
 
-  /* Flow rows */
+  /* Flow steps */
   .flow-row {
     display: flex;
     align-items: center;
     gap: 0;
-    margin: 8px 0;
-    flex-wrap: nowrap;
+    margin: 10px 0;
   }
   .flow-step {
     border-radius: 10px;
-    padding: 12px 16px;
+    padding: 14px 18px;
     text-align: center;
     border: 2px solid;
     min-width: 180px;
+    background: #fff;
+    box-shadow: 2px 2px 0 rgba(0,0,0,0.06);
     position: relative;
   }
   .flow-step .num {
     position: absolute;
     top: -10px;
     left: -10px;
-    width: 24px;
-    height: 24px;
+    width: 26px;
+    height: 26px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 14px;
-    font-weight: 700;
+    font-size: 15px;
     color: #fff;
   }
-  .flow-step .title { font-size: 18px; font-weight: 600; }
-  .flow-step .desc { font-size: 13px; opacity: 0.6; }
+  .flow-step .title {
+    font-size: 20px;
+    font-weight: 400;
+  }
+  .flow-step .desc {
+    font-size: 15px;
+    color: #888;
+    margin-top: 2px;
+  }
   .flow-arrow {
     font-size: 28px;
-    margin: 0 6px;
+    margin: 0 8px;
     flex-shrink: 0;
+    color: #aaa;
   }
 
-  /* Retrieval 3-door */
-  .doors-container {
-    border: 2px solid #4da6ff;
+  /* 3-door retrieval */
+  .doors-box {
+    border: 2px solid #4472C4;
     border-radius: 12px;
     padding: 16px 20px 14px;
-    background: #1a2a3d;
+    background: #EDF2FA;
     margin: 0 6px;
+    box-shadow: 2px 2px 0 rgba(0,0,0,0.06);
   }
-  .doors-label { font-size: 22px; font-weight: 600; color: #4dffff; text-align: center; margin-bottom: 10px; }
+  .doors-title {
+    font-size: 22px;
+    text-align: center;
+    color: #4472C4;
+    margin-bottom: 10px;
+  }
   .doors {
     display: flex;
-    gap: 12px;
+    gap: 14px;
     justify-content: center;
   }
   .door {
-    border: 2px solid #4dffff;
+    border: 2px solid #4472C4;
     border-radius: 8px;
-    padding: 8px 16px;
+    padding: 10px 18px;
     text-align: center;
-    background: #2d2d2d;
-    min-width: 110px;
+    background: #fff;
+    min-width: 120px;
   }
-  .door .dname { font-size: 16px; font-weight: 600; color: #4dffff; }
-  .door .ddesc { font-size: 12px; color: #868e96; }
-  .fusion-formula {
+  .door .dname {
+    font-size: 18px;
+    color: #4472C4;
+  }
+  .door .ddesc {
+    font-size: 14px;
+    color: #888;
+  }
+  .fusion {
     text-align: center;
-    color: #868e96;
+    color: #888;
     font-size: 16px;
     margin-top: 10px;
     font-style: italic;
@@ -130,22 +156,30 @@
   .cmd-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 12px;
-    margin: 12px 0;
+    gap: 14px;
+    margin: 14px 0;
   }
   .cmd-card {
     border-radius: 10px;
-    padding: 12px 16px;
+    padding: 14px 18px;
     border: 2px solid;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
+    background: #fff;
+    box-shadow: 2px 2px 0 rgba(0,0,0,0.06);
   }
-  .cmd-card .cmd-icon { font-size: 22px; flex-shrink: 0; }
-  .cmd-card .cmd-name { font-size: 17px; font-weight: 600; }
-  .cmd-card .cmd-desc { font-size: 13px; opacity: 0.55; }
+  .cmd-card .cmd-name {
+    font-size: 19px;
+    font-weight: 400;
+  }
+  .cmd-card .cmd-desc {
+    font-size: 15px;
+    color: #888;
+  }
   .cmd-card .dot {
-    width: 10px; height: 10px;
+    width: 10px;
+    height: 10px;
     border-radius: 50%;
     margin-left: auto;
     flex-shrink: 0;
@@ -154,17 +188,28 @@
   /* MCP tools */
   .mcp-row {
     display: flex;
-    gap: 20px;
-    margin: 12px 0;
+    gap: 24px;
+    margin: 14px 0;
   }
   .mcp-card {
     border-radius: 12px;
-    padding: 18px 24px;
+    padding: 20px 28px;
     border: 2px solid;
     flex: 1;
+    background: #fff;
+    box-shadow: 2px 2px 0 rgba(0,0,0,0.06);
   }
-  .mcp-card .mcp-title { font-size: 24px; font-weight: 600; text-align: center; margin-bottom: 6px; }
-  .mcp-card .mcp-sub { text-align: center; font-size: 15px; opacity: 0.6; margin-bottom: 10px; }
+  .mcp-card .mcp-title {
+    font-size: 24px;
+    text-align: center;
+    margin-bottom: 6px;
+  }
+  .mcp-card .mcp-sub {
+    text-align: center;
+    font-size: 16px;
+    color: #888;
+    margin-bottom: 12px;
+  }
   .mcp-ops {
     display: flex;
     gap: 8px;
@@ -174,40 +219,44 @@
   .mcp-op {
     border: 2px solid;
     border-radius: 6px;
-    padding: 6px 12px;
+    padding: 6px 14px;
     text-align: center;
-    font-size: 14px;
-    background: #1a1a2e;
+    font-size: 15px;
+    background: #F8F9FA;
   }
-  .mcp-op .op-name { font-weight: 600; font-size: 14px; }
-  .mcp-op .op-desc { font-size: 11px; opacity: 0.6; }
+  .mcp-op .op-name {
+    font-weight: 400;
+    font-size: 15px;
+  }
+  .mcp-op .op-desc {
+    font-size: 13px;
+    color: #888;
+  }
 
   /* Legend */
   .legend {
     display: flex;
-    gap: 30px;
+    gap: 36px;
     justify-content: center;
-    margin: 30px 0 10px;
-    font-size: 16px;
-    color: #868e96;
+    margin: 32px 0 10px;
+    font-size: 17px;
+    color: #666;
   }
   .legend-dot {
-    width: 12px; height: 12px;
+    width: 12px;
+    height: 12px;
     border-radius: 50%;
     display: inline-block;
     vertical-align: middle;
     margin-right: 6px;
   }
+
+  /* Footer */
   .footer {
     text-align: center;
-    color: #a64dff;
-    font-size: 20px;
-    margin-top: 20px;
-  }
-  .footer-sub {
-    text-align: center;
-    color: #868e96;
-    font-size: 15px;
+    color: #888;
+    font-size: 18px;
+    margin-top: 24px;
   }
 </style>
 </head>
@@ -218,207 +267,183 @@
 
 <!-- Entry Points -->
 <div class="entries">
-  <div class="entry-card" style="border-color:#a64dff; background:#2d1f4e;">
-    <div class="icon">🖥️</div>
-    <div class="name" style="color:#a64dff;">CLI</div>
+  <div class="entry-card" style="border-color:#7C3AED;">
+    <div class="name" style="color:#7C3AED;">CLI</div>
     <div class="sub">onemem &lt;command&gt;</div>
   </div>
-  <div class="entry-card" style="border-color:#4da6ff; background:#1f3d4e;">
-    <div class="icon">🤖</div>
-    <div class="name" style="color:#4da6ff;">MCP Server</div>
+  <div class="entry-card" style="border-color:#4472C4;">
+    <div class="name" style="color:#4472C4;">MCP Server</div>
     <div class="sub">onemem-mcp</div>
   </div>
-  <div class="entry-card" style="border-color:#ff994d; background:#3d2d1f;">
-    <div class="icon">🌐</div>
-    <div class="name" style="color:#ff994d;">HTTP API</div>
+  <div class="entry-card" style="border-color:#ED7D31;">
+    <div class="name" style="color:#ED7D31;">HTTP API</div>
     <div class="sub">FastAPI /events</div>
   </div>
 </div>
 
 <!-- WRITE PATH -->
-<hr class="section-line">
-<p class="section-title" style="color:#4dff88;">✍️ Write Path</p>
+<div class="section-label">Write Path</div>
 <div class="flow-row">
-  <div class="flow-step" style="border-color:#4dff88; background:#1a2e1a;">
-    <div class="num" style="background:#4dff88; color:#191919;">①</div>
-    <div class="title" style="color:#4dff88;">ingest_event()</div>
-    <div class="desc">chunk → dedup → store</div>
+  <div class="flow-step" style="border-color:#2E7D32;">
+    <div class="num" style="background:#2E7D32;">1</div>
+    <div class="title" style="color:#2E7D32;">ingest_event()</div>
+    <div class="desc">chunk + dedup + store</div>
   </div>
-  <div class="flow-arrow" style="color:#4dff88;">→</div>
-  <div class="flow-step" style="border-color:#4dff88; background:#1a2e1a;">
-    <div class="num" style="background:#4dff88; color:#191919;">②</div>
-    <div class="title" style="color:#4dff88;">extract_entities()</div>
-    <div class="desc">LLM → facts + entities</div>
+  <div class="flow-arrow">&rarr;</div>
+  <div class="flow-step" style="border-color:#2E7D32;">
+    <div class="num" style="background:#2E7D32;">2</div>
+    <div class="title" style="color:#2E7D32;">extract_entities()</div>
+    <div class="desc">LLM &rarr; facts + entities</div>
   </div>
-  <div class="flow-arrow" style="color:#4dff88;">→</div>
-  <div class="flow-step" style="border-color:#4dff88; background:#1a2e1a;">
-    <div class="num" style="background:#4dff88; color:#191919;">③</div>
-    <div class="title" style="color:#4dff88;">reconcile + store</div>
-    <div class="desc">entities → edges → facts</div>
+  <div class="flow-arrow">&rarr;</div>
+  <div class="flow-step" style="border-color:#2E7D32;">
+    <div class="num" style="background:#2E7D32;">3</div>
+    <div class="title" style="color:#2E7D32;">reconcile + store</div>
+    <div class="desc">normalize + link</div>
   </div>
-  <div class="flow-arrow" style="color:#4dff88;">→</div>
-  <div class="flow-step" style="border-color:#4dff88; background:#1a2e1a;">
-    <div class="num" style="background:#4dff88; color:#191919;">④</div>
-    <div class="title" style="color:#4dff88;">embed_facts()</div>
+  <div class="flow-arrow">&rarr;</div>
+  <div class="flow-step" style="border-color:#2E7D32;">
+    <div class="num" style="background:#2E7D32;">4</div>
+    <div class="title" style="color:#2E7D32;">embed_facts()</div>
     <div class="desc">bge-base 768-d local</div>
   </div>
-  <div class="flow-arrow" style="color:#ffd64d;">→</div>
-  <div class="flow-step" style="border-color:#ffd64d; background:#2d2d1f; min-width:100px;">
-    <div class="title" style="color:#ffd64d; font-size:28px;">📦</div>
-    <div class="desc" style="color:#ffd64d;">SQLite</div>
+  <div class="flow-arrow">&rarr;</div>
+  <div class="flow-step" style="border-color:#F9A825; min-width:110px;">
+    <div class="title" style="color:#F9A825; font-size:22px;">SQLite</div>
+    <div class="desc">onemem.db</div>
   </div>
 </div>
 
 <!-- READ PATH -->
-<hr class="section-line">
-<p class="section-title" style="color:#4da6ff;">📖 Read Path</p>
+<div class="section-label">Read Path</div>
 <div class="flow-row" style="align-items:stretch;">
-  <div class="flow-step" style="border-color:#4da6ff; background:#1a2a3d;">
-    <div class="num" style="background:#4da6ff; color:#191919;">①</div>
-    <div class="title" style="color:#4da6ff;">LLM param extraction</div>
-    <div class="desc">question → topic + dates</div>
+  <div class="flow-step" style="border-color:#1565C0;">
+    <div class="num" style="background:#1565C0;">1</div>
+    <div class="title" style="color:#1565C0;">LLM param extraction</div>
+    <div class="desc">question &rarr; topic + dates</div>
   </div>
-  <div class="flow-arrow" style="color:#4da6ff;">→</div>
+  <div class="flow-arrow">&rarr;</div>
 
-  <div class="doors-container">
-    <div class="doors-label">② Deterministic Retrieval</div>
+  <div class="doors-box">
+    <div class="doors-title">Deterministic Retrieval</div>
     <div class="doors">
       <div class="door"><div class="dname">Vector</div><div class="ddesc">cosine sim</div></div>
       <div class="door"><div class="dname">Keyword</div><div class="ddesc">BM25 FTS5</div></div>
       <div class="door"><div class="dname">Entity</div><div class="ddesc">fact edges</div></div>
     </div>
-    <div class="fusion-formula">fused = 1 − (1 − v) · (1 − f) · (1 − e)</div>
+    <div class="fusion">noisy-OR fusion &rarr; adaptive cut</div>
   </div>
 
-  <div class="flow-arrow" style="color:#4da6ff;">→</div>
-  <div class="flow-step" style="border-color:#4da6ff; background:#1a2a3d;">
-    <div class="num" style="background:#4da6ff; color:#191919;">③</div>
-    <div class="title" style="color:#4da6ff;">Adaptive Cut</div>
-    <div class="desc">score-curve ratio</div>
+  <div class="flow-arrow">&rarr;</div>
+  <div class="flow-step" style="border-color:#1565C0;">
+    <div class="num" style="background:#1565C0;">3</div>
+    <div class="title" style="color:#1565C0;">Source Collapse</div>
+    <div class="desc">facts vs raw event</div>
   </div>
-  <div class="flow-arrow" style="color:#4da6ff;">→</div>
-  <div class="flow-step" style="border-color:#4da6ff; background:#1a2a3d;">
-    <div class="num" style="background:#4da6ff; color:#191919;">④</div>
-    <div class="title" style="color:#4da6ff;">LLM Synthesis</div>
+  <div class="flow-arrow">&rarr;</div>
+  <div class="flow-step" style="border-color:#1565C0;">
+    <div class="num" style="background:#1565C0;">4</div>
+    <div class="title" style="color:#1565C0;">LLM Synthesis</div>
     <div class="desc">(optional answer)</div>
   </div>
 </div>
 
 <!-- ALL COMMANDS -->
-<hr class="section-line">
-<p class="section-title" style="color:#ffd64d;">⚡ All Commands</p>
+<div class="section-label">All Commands</div>
 <div class="cmd-grid">
-  <div class="cmd-card" style="border-color:#a64dff; background:#2d1f4e;">
-    <span class="cmd-icon">🚀</span>
+  <div class="cmd-card" style="border-color:#7C3AED;">
     <div><div class="cmd-name">onemem init</div><div class="cmd-desc">Interactive setup wizard</div></div>
-    <div class="dot" style="background:#a64dff;"></div>
+    <div class="dot" style="background:#7C3AED;"></div>
   </div>
-  <div class="cmd-card" style="border-color:#4dff88; background:#1a2e1a;">
-    <span class="cmd-icon">➕</span>
+  <div class="cmd-card" style="border-color:#2E7D32;">
     <div><div class="cmd-name">onemem add "text"</div><div class="cmd-desc">Store a note directly</div></div>
-    <div class="dot" style="background:#4dff88;"></div>
+    <div class="dot" style="background:#2E7D32;"></div>
   </div>
-  <div class="cmd-card" style="border-color:#4da6ff; background:#1a2a3d;">
-    <span class="cmd-icon">💬</span>
+  <div class="cmd-card" style="border-color:#1565C0;">
     <div><div class="cmd-name">onemem ask "question"</div><div class="cmd-desc">Retrieve + synthesize</div></div>
-    <div class="dot" style="background:#4da6ff;"></div>
+    <div class="dot" style="background:#1565C0;"></div>
   </div>
-  <div class="cmd-card" style="border-color:#4dffff; background:#1a2e2e;">
-    <span class="cmd-icon">👁️</span>
+  <div class="cmd-card" style="border-color:#00838F;">
     <div><div class="cmd-name">onemem watch</div><div class="cmd-desc">Capture AI sessions</div></div>
-    <div class="dot" style="background:#4dffff;"></div>
+    <div class="dot" style="background:#00838F;"></div>
   </div>
-  <div class="cmd-card" style="border-color:#4dff88; background:#1a2e1a;">
-    <span class="cmd-icon">📂</span>
+  <div class="cmd-card" style="border-color:#2E7D32;">
     <div><div class="cmd-name">onemem import &lt;path&gt;</div><div class="cmd-desc">Bulk import files</div></div>
-    <div class="dot" style="background:#4dff88;"></div>
+    <div class="dot" style="background:#2E7D32;"></div>
   </div>
-  <div class="cmd-card" style="border-color:#4dff88; background:#1a2e1a;">
-    <span class="cmd-icon">⚙️</span>
+  <div class="cmd-card" style="border-color:#2E7D32;">
     <div><div class="cmd-name">onemem process</div><div class="cmd-desc">Process pending events</div></div>
-    <div class="dot" style="background:#4dff88;"></div>
+    <div class="dot" style="background:#2E7D32;"></div>
   </div>
-  <div class="cmd-card" style="border-color:#ff994d; background:#3d2d1f;">
-    <span class="cmd-icon">🩺</span>
+  <div class="cmd-card" style="border-color:#ED7D31;">
     <div><div class="cmd-name">onemem doctor</div><div class="cmd-desc">Health check everything</div></div>
-    <div class="dot" style="background:#ff994d;"></div>
+    <div class="dot" style="background:#ED7D31;"></div>
   </div>
-  <div class="cmd-card" style="border-color:#ff994d; background:#3d2d1f;">
-    <span class="cmd-icon">📊</span>
-    <div><div class="cmd-name">onemem status</div><div class="cmd-desc">Event/fact counts</div></div>
-    <div class="dot" style="background:#ff994d;"></div>
+  <div class="cmd-card" style="border-color:#ED7D31;">
+    <div><div class="cmd-name">onemem status</div><div class="cmd-desc">Event / fact counts</div></div>
+    <div class="dot" style="background:#ED7D31;"></div>
   </div>
-  <div class="cmd-card" style="border-color:#a64dff; background:#2d1f4e;">
-    <span class="cmd-icon">🔧</span>
-    <div><div class="cmd-name">onemem config set</div><div class="cmd-desc">Change provider/model</div></div>
-    <div class="dot" style="background:#a64dff;"></div>
+  <div class="cmd-card" style="border-color:#7C3AED;">
+    <div><div class="cmd-name">onemem config set</div><div class="cmd-desc">Change provider / model</div></div>
+    <div class="dot" style="background:#7C3AED;"></div>
   </div>
-  <div class="cmd-card" style="border-color:#ff994d; background:#3d2d1f;">
-    <span class="cmd-icon">👁️</span>
+  <div class="cmd-card" style="border-color:#ED7D31;">
     <div><div class="cmd-name">onemem config show</div><div class="cmd-desc">Show active config</div></div>
-    <div class="dot" style="background:#ff994d;"></div>
+    <div class="dot" style="background:#ED7D31;"></div>
   </div>
-  <div class="cmd-card" style="border-color:#ff994d; background:#3d2d1f;">
-    <span class="cmd-icon">📋</span>
+  <div class="cmd-card" style="border-color:#ED7D31;">
     <div><div class="cmd-name">onemem list events</div><div class="cmd-desc">Browse stored events</div></div>
-    <div class="dot" style="background:#ff994d;"></div>
+    <div class="dot" style="background:#ED7D31;"></div>
   </div>
-  <div class="cmd-card" style="border-color:#ff994d; background:#3d2d1f;">
-    <span class="cmd-icon">🔍</span>
+  <div class="cmd-card" style="border-color:#ED7D31;">
     <div><div class="cmd-name">onemem show event N</div><div class="cmd-desc">Full event detail</div></div>
-    <div class="dot" style="background:#ff994d;"></div>
+    <div class="dot" style="background:#ED7D31;"></div>
   </div>
-  <div class="cmd-card" style="border-color:#ff994d; background:#3d2d1f;">
-    <span class="cmd-icon">🗃️</span>
+  <div class="cmd-card" style="border-color:#ED7D31;">
     <div><div class="cmd-name">onemem sql "SELECT..."</div><div class="cmd-desc">Read-only SQL query</div></div>
-    <div class="dot" style="background:#ff994d;"></div>
+    <div class="dot" style="background:#ED7D31;"></div>
   </div>
-  <div class="cmd-card" style="border-color:#ff994d; background:#3d2d1f;">
-    <span class="cmd-icon">📑</span>
+  <div class="cmd-card" style="border-color:#ED7D31;">
     <div><div class="cmd-name">onemem tables</div><div class="cmd-desc">List DB tables + counts</div></div>
-    <div class="dot" style="background:#ff994d;"></div>
+    <div class="dot" style="background:#ED7D31;"></div>
   </div>
-  <div class="cmd-card" style="border-color:#4da6ff; background:#1a2a3d;">
-    <span class="cmd-icon">🤖</span>
+  <div class="cmd-card" style="border-color:#4472C4;">
     <div><div class="cmd-name">onemem-mcp</div><div class="cmd-desc">MCP server (2 tools)</div></div>
-    <div class="dot" style="background:#ffd64d;"></div>
+    <div class="dot" style="background:#F9A825;"></div>
   </div>
 </div>
 
 <!-- MCP TOOLS -->
-<hr class="section-line">
-<p class="section-title" style="color:#ff4da6;">🔌 MCP Tools <span style="font-size:18px; opacity:0.5;">(for AI agents)</span></p>
+<div class="section-label">MCP Tools <span style="font-size:18px; color:#aaa;">(for AI agents)</span></div>
 <div class="mcp-row">
-  <div class="mcp-card" style="border-color:#ff4da6; background:#2d1f3d;">
-    <div class="mcp-title" style="color:#ff4da6;">onemem_recall</div>
+  <div class="mcp-card" style="border-color:#C2185B;">
+    <div class="mcp-title" style="color:#C2185B;">onemem_recall</div>
     <div class="mcp-sub">The ONE read entry point</div>
     <div class="mcp-ops">
-      <div class="mcp-op" style="border-color:#ff4da6;"><div class="op-name" style="color:#ff4da6;">query</div><div class="op-desc">topic search</div></div>
-      <div class="mcp-op" style="border-color:#ff4da6;"><div class="op-name" style="color:#ff4da6;">start/end</div><div class="op-desc">time window</div></div>
-      <div class="mcp-op" style="border-color:#ff4da6;"><div class="op-name" style="color:#ff4da6;">around</div><div class="op-desc">session reconstruct</div></div>
-      <div class="mcp-op" style="border-color:#ff4da6;"><div class="op-name" style="color:#ff4da6;">source_event</div><div class="op-desc">raw source</div></div>
+      <div class="mcp-op" style="border-color:#C2185B;"><div class="op-name" style="color:#C2185B;">query</div><div class="op-desc">topic search</div></div>
+      <div class="mcp-op" style="border-color:#C2185B;"><div class="op-name" style="color:#C2185B;">start / end</div><div class="op-desc">time window</div></div>
+      <div class="mcp-op" style="border-color:#C2185B;"><div class="op-name" style="color:#C2185B;">around</div><div class="op-desc">session reconstruct</div></div>
+      <div class="mcp-op" style="border-color:#C2185B;"><div class="op-name" style="color:#C2185B;">source_event</div><div class="op-desc">raw source</div></div>
     </div>
   </div>
-  <div class="mcp-card" style="border-color:#4dff88; background:#1f3d2d;">
-    <div class="mcp-title" style="color:#4dff88;">onemem_log</div>
+  <div class="mcp-card" style="border-color:#2E7D32;">
+    <div class="mcp-title" style="color:#2E7D32;">onemem_log</div>
     <div class="mcp-sub">Invisible background write</div>
-    <div style="text-align:center; font-size:15px; color:#868e96; line-height:1.6;">
+    <div style="text-align:center; font-size:16px; color:#888; line-height:1.6;">
       Silently logs every conversation<br>
-      <span style="color:#4dff88;">→ no announcement, no permission, no waiting</span>
+      <span style="color:#2E7D32;">no announcement, no permission, no waiting</span>
     </div>
   </div>
 </div>
 
 <!-- Legend -->
-<hr class="section-line">
 <div class="legend">
-  <span><span class="legend-dot" style="background:#4dff88;"></span> Write path</span>
-  <span><span class="legend-dot" style="background:#4da6ff;"></span> Read path</span>
-  <span><span class="legend-dot" style="background:#ffd64d;"></span> Both</span>
+  <span><span class="legend-dot" style="background:#2E7D32;"></span> Write path</span>
+  <span><span class="legend-dot" style="background:#1565C0;"></span> Read path</span>
+  <span><span class="legend-dot" style="background:#F9A825;"></span> Storage</span>
 </div>
 
-<p class="footer">oneMEM — One memory. Every AI. You own it.</p>
-<p class="footer-sub">github.com/shashank-tomar0/onemem</p>
+<p class="footer">oneMEM &mdash; One memory. Every AI. You own it.</p>
 
 </body>
 </html>
