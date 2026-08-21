@@ -18,7 +18,7 @@ jobs:
       - name: Run tests
         run: pytest -q
       - name: CLI entry point
-        run: men --help
+        run: onemem --help
 
   clean-install:
     runs-on: ubuntu-latest
@@ -37,5 +37,5 @@ jobs:
           pip install "${WHEEL}[all]"
       - name: Verify entry points and imports
         run: |
-          men --help
+          onemem --help
           python -c "import onemem, onemem.config, onemem.db, onemem.fact_retrieval, onemem.mcp_server, onemem.pipeline"
