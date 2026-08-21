@@ -101,6 +101,8 @@ def _process_loop() -> None:
         try:
             if model is None:
                 model = get_model_if_available()
+            if embedding_model is None:
+                embedding_model = get_embedding_if_available()
             if model is not None:
                 process_pending_events(conn, model, embedding_model)
         except Exception as exc:  # never let the daemon die

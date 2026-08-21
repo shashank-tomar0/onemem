@@ -278,9 +278,10 @@ def test_provider_recommendation_can_be_overridden(tmp_path, monkeypatch):
     assert 'model = "grok-custom"' in (onemem_home / "config.toml").read_text()
     env_path = onemem_home / ".env"
     assert 'XAI_API_KEY="valid-key"' in env_path.read_text()
-    assert stat.S_IMODE(onemem_home.stat().st_mode) == 0o700
-    assert stat.S_IMODE(env_path.stat().st_mode) == 0o600
-    assert stat.S_IMODE((onemem_home / "config.toml").stat().st_mode) == 0o600
+    if platform.system() != "Windows":
+        assert stat.S_IMODE(onemem_home.stat().st_mode) == 0o700
+        assert stat.S_IMODE(env_path.stat().st_mode) == 0o600
+        assert stat.S_IMODE((onemem_home / "config.toml").stat().st_mode) == 0o600
 
 
 def test_sql_command_cannot_write_through_pragma(tmp_path, monkeypatch):
@@ -432,7 +433,7 @@ def test_launchagent_preserves_uv_tool_python_symlink(tmp_path, monkeypatch):
     assert [
         "launchctl",
         "bootstrap",
-        f"gui/{os.getuid()}",
+        f"gui/{cli_main._safe_uid()}",
         str(plist_path),
     ] in calls
 
@@ -598,7 +599,7 @@ def test_watch_stop_removes_the_launchagent(tmp_path, monkeypatch):
 
     assert result.exit_code == 0
     assert not plist_path.exists()
-    assert ["launchctl", "bootout", f"gui/{os.getuid()}/ai.onemem.watch"] in calls
+    assert ["launchctl", "bootout", f"gui/{cli_main._safe_uid()}/ai.onemem.watch"] in calls
     assert "stopped and removed" in result.output
 
 

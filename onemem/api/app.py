@@ -11,18 +11,25 @@ load_env()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    import logging
+
     from onemem.db import get_connection, init_db
     from onemem.pipeline import process_pending_events
-    from onemem.providers import get_embedding_model, get_model
+    from onemem.providers import get_embedding_if_available, get_model_if_available
     from onemem.startup import announce_embedding_state
 
-    model = get_model()
-    embedding_model = get_embedding_model()
+    logger = logging.getLogger(__name__)
+
+    model = get_model_if_available()
+    embedding_model = get_embedding_if_available()
     conn = get_connection()
     try:
         init_db(conn)
         announce_embedding_state()
-        process_pending_events(conn, model, embedding_model)
+        if model is not None:
+            process_pending_events(conn, model, embedding_model)
+        else:
+            logger.warning("No LLM configured; API started but new memories will remain pending.")
     finally:
         conn.close()
 

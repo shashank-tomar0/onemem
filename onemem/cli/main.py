@@ -890,12 +890,18 @@ def _uninstall_background_service() -> None:
         click.echo(f"  ~ No background service is installed on {system}.")
 
 
-def _launchd_service() -> str:
-    """The launchd service target: one spelling, used by install, stop, and status."""
+def _safe_uid() -> int:
+    """Return the current user ID, returning 0 on platforms without getuid (Windows)."""
 
     import os
 
-    return f"gui/{os.getuid()}/{_BACKGROUND_SERVICE_LABEL}"
+    return os.getuid() if hasattr(os, "getuid") else 0
+
+
+def _launchd_service() -> str:
+    """The launchd service target: one spelling, used by install, stop, and status."""
+
+    return f"gui/{_safe_uid()}/{_BACKGROUND_SERVICE_LABEL}"
 
 
 def _launchagent_plist_path():
@@ -1047,7 +1053,7 @@ def _install_launchagent(python_path: str) -> None:
 
     from onemem.home import ONEMEM_HOME
 
-    domain = f"gui/{os.getuid()}"
+    domain = f"gui/{_safe_uid()}"
     service = _launchd_service()
     plist_path = _launchagent_plist_path()
     plist_path.parent.mkdir(parents=True, exist_ok=True)
